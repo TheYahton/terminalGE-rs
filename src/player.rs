@@ -16,7 +16,7 @@ impl Player {
     }
 
     pub fn movement(&mut self) {
-        let mut delta = Vec2::zero();
+        let mut delta: Vec2 = Vec2::zero();
 
         if self.keys[0] {
             delta.y += -1.0;

@@ -34,8 +34,8 @@ pub fn line(display: &mut dyn Display, x0: i64, x1: i64, y0: i64, y1: i64, color
 pub fn circle(display: &mut dyn Display, x1: i64, y1: i64, radius: i64, color: &Color) {
     let mut x: i64 = 0;
     let mut y: i64 = radius;
-    let mut delta = 1 - 2 * y;
-    let mut _error = 0;
+    let mut delta: i64 = 1 - 2 * y;
+    let mut _error: i64 = 0;
     while y >= x {
         display.plot(x1 + x, y1 + y, color);
         display.plot(x1 + x, y1 - y, color);

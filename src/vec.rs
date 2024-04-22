@@ -6,7 +6,7 @@ pub struct Vec2 {
 #[allow(dead_code)]
 impl Vec2 {
     pub fn new(x: f64, y: f64) -> Self {
-        Self { x: x, y: y }
+        Self { x, y }
     }
     pub fn zero() -> Self {
         Self { x: 0.0, y: 0.0 }

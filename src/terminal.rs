@@ -27,8 +27,8 @@ impl Terminal {
         Terminal {
             body: vec![' '; (width * height) as usize],
             stdout: std::io::stdout(),
-            width: width,
-            height: height,
+            width,
+            height,
             aspect: width as f64 / height as f64,
             pixel_aspect: size.height as f64 / size.width as f64,
             time_point: std::time::SystemTime::now(),
@@ -52,9 +52,7 @@ impl Terminal {
     }
 
     pub fn fill(&mut self) {
-        // self.body = vec![' '; self.width as usize * self.height as usize]; // works better when opt-level 1
-        self.body.fill(' '); // works better when opt-level 2+
-                             // self.body.clear(); // doesn't work ;(
+        self.body.fill(' ');
     }
 
     pub fn print(&mut self) {
@@ -62,8 +60,6 @@ impl Terminal {
         let _ = self
             .stdout
             .write_fmt(format_args!("{}", String::from_iter(self.body.clone())));
-        // let s = self.body.clone().into_iter().collect::<String>();
-        // print!("{}", s);
     }
 
     pub fn cursor_move(&mut self, x: u16, y: u16) {
