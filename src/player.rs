@@ -1,4 +1,4 @@
-use crate::{display::Display, vec::Vec2};
+use crate::vec::Vec2;
 
 pub struct Player {
     pub position: Vec2,
@@ -13,11 +13,6 @@ impl Player {
             speed: 1.0,
             keys: [false; 4],
         }
-    }
-
-    pub fn draw(&self, display: &mut Display) {
-        let Vec2 { x, y } = self.position;
-        display.plot(x as i64, y as i64, 'A');
     }
 
     pub fn movement(&mut self) {
