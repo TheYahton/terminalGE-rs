@@ -69,8 +69,8 @@ impl std::ops::Div for Vec2 {
 // +=
 impl std::ops::AddAssign for Vec2 {
     fn add_assign(&mut self, rhs: Self) {
-        self.x += rhs.y;
-        self.x += rhs.y;
+        self.x += rhs.x;
+        self.y += rhs.y;
     }
 }
 // * f64
