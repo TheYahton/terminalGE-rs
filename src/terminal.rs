@@ -6,7 +6,7 @@ use crossterm::{
     ExecutableCommand,
 };
 
-use crate::drawing::Display;
+use crate::drawing::{Color, Display};
 
 pub struct Terminal {
     body: Vec<char>,
@@ -110,11 +110,11 @@ impl Terminal {
 }
 
 impl Display for Terminal {
-    fn plot(&mut self, x: i64, y: i64, symbol: char) {
+    fn plot(&mut self, x: i64, y: i64, _color: &Color) {
         let rationed_x = x as f64 * self.aspect * self.pixel_aspect;
         if rationed_x >= self.width as f64 || y >= self.height as i64 || x < 0 || y < 0 {
             return;
         }
-        self.body[rationed_x as usize + y as usize * self.width as usize] = symbol
+        self.body[rationed_x as usize + y as usize * self.width as usize] = '@';
     }
 }

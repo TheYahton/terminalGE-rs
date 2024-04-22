@@ -1,15 +1,14 @@
-use crate::vec::Vec2;
+pub struct Color(pub u8, pub u8, pub u8);
 
 pub trait Display {
-    fn plot(&mut self, x: i64, y: i64, symbol: char);
+    fn plot(&mut self, x: i64, y: i64, color: &Color);
 }
 
-pub fn draw_pixel(display: &mut dyn Display, position: &Vec2, pixel: char) {
-    let Vec2 { x, y } = position;
-    display.plot(*x as i64, *y as i64, pixel);
+pub fn pixel(display: &mut dyn Display, x: i64, y: i64, color: &Color) {
+    display.plot(x, y, color);
 }
 
-pub fn draw_line(display: &mut dyn Display, x0: i64, x1: i64, y0: i64, y1: i64) {
+pub fn line(display: &mut dyn Display, x0: i64, x1: i64, y0: i64, y1: i64, color: &Color) {
     let deltax: i64 = (x1 - x0).abs();
     let deltay: i64 = (y1 - y0).abs();
     let mut error: i64 = 0;
@@ -23,7 +22,7 @@ pub fn draw_line(display: &mut dyn Display, x0: i64, x1: i64, y0: i64, y1: i64) 
         diry = -1;
     }
     for x in x0..x1 {
-        display.plot(x, y, '@');
+        display.plot(x, y, color);
         error = error + deltaerr;
         if error >= deltax + 1 {
             y = y + diry;
@@ -32,20 +31,20 @@ pub fn draw_line(display: &mut dyn Display, x0: i64, x1: i64, y0: i64, y1: i64) 
     }
 }
 
-pub fn draw_circle(display: &mut dyn Display, x1: i64, y1: i64, radius: i64) {
+pub fn circle(display: &mut dyn Display, x1: i64, y1: i64, radius: i64, color: &Color) {
     let mut x: i64 = 0;
     let mut y: i64 = radius;
     let mut delta = 1 - 2 * y;
     let mut _error = 0;
     while y >= x {
-        display.plot(x1 + x, y1 + y, '@');
-        display.plot(x1 + x, y1 - y, '@');
-        display.plot(x1 - x, y1 + y, '@');
-        display.plot(x1 - x, y1 - y, '@');
-        display.plot(x1 + y, y1 + x, '@');
-        display.plot(x1 + y, y1 - x, '@');
-        display.plot(x1 - y, y1 + x, '@');
-        display.plot(x1 - y, y1 - x, '@');
+        display.plot(x1 + x, y1 + y, color);
+        display.plot(x1 + x, y1 - y, color);
+        display.plot(x1 - x, y1 + y, color);
+        display.plot(x1 - x, y1 - y, color);
+        display.plot(x1 + y, y1 + x, color);
+        display.plot(x1 + y, y1 - x, color);
+        display.plot(x1 - y, y1 + x, color);
+        display.plot(x1 - y, y1 - x, color);
         _error = 2 * (delta + y) - 1;
         if (delta < 0) && (_error <= 0) {
             x += 1;
