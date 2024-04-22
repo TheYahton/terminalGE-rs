@@ -6,7 +6,7 @@ use crossterm::{
     ExecutableCommand,
 };
 
-use crate::display::Display;
+use crate::drawing::Display;
 
 pub struct Terminal {
     body: Vec<char>,

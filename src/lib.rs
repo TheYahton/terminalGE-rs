@@ -1,4 +1,4 @@
 pub mod terminal;
-pub mod display;
+pub mod drawing;
 pub mod player;
 pub mod vec;
