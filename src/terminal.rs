@@ -1,12 +1,15 @@
 use std::{io::Write, time::Duration};
 
 use crossterm::{
-    event::Event,
+    event::{Event, KeyCode, KeyModifiers},
     terminal::{window_size, WindowSize},
     ExecutableCommand,
 };
 
-use crate::drawing::{Color, Display};
+use crate::{
+    drawing::{Color, Display},
+    event,
+};
 
 pub struct Terminal {
     body: Vec<char>,
@@ -33,14 +36,6 @@ impl Terminal {
             pixel_aspect: size.height as f64 / size.width as f64,
             time_point: std::time::SystemTime::now(),
         }
-    }
-
-    pub fn is_event_available() -> std::io::Result<bool> {
-        crossterm::event::poll(std::time::Duration::from_secs(0))
-    }
-
-    pub fn read_event() -> Result<Event, std::io::Error> {
-        crossterm::event::read()
     }
 
     pub fn show_cursor(&mut self) {
@@ -112,5 +107,60 @@ impl Display for Terminal {
             return;
         }
         self.body[rationed_x as usize + y as usize * self.width as usize] = '@';
+    }
+}
+
+impl From<crossterm::event::KeyCode> for event::KeyCode {
+    fn from(value: crossterm::event::KeyCode) -> Self {
+        match value {
+            KeyCode::Up => event::KeyCode::Up,
+            KeyCode::Down => event::KeyCode::Down,
+            KeyCode::Left => event::KeyCode::Left,
+            KeyCode::Right => event::KeyCode::Right,
+            KeyCode::Char(chr) => event::KeyCode::Char(chr),
+            _ => event::KeyCode::NotImplemented,
+        }
+    }
+}
+
+impl From<crossterm::event::KeyModifiers> for event::KeyModifiers {
+    fn from(value: crossterm::event::KeyModifiers) -> Self {
+        match value {
+            KeyModifiers::SHIFT => event::KeyModifiers::SHIFT,
+            KeyModifiers::CONTROL => event::KeyModifiers::CONTROL,
+            _ => event::KeyModifiers::NONE,
+        }
+    }
+}
+
+impl From<crossterm::event::KeyEvent> for event::KeyEvent {
+    fn from(value: crossterm::event::KeyEvent) -> Self {
+        event::KeyEvent::new_with_modifiers(value.code.into(), value.modifiers.into())
+    }
+}
+
+impl From<crossterm::event::Event> for event::Event {
+    fn from(cevent: crossterm::event::Event) -> Self {
+        let key: event::KeyEvent = match cevent {
+            Event::Key(l) => event::KeyEvent::from(l),
+            _ => event::KeyEvent::new(event::KeyCode::NotImplemented),
+        };
+        event::Event::Key(key)
+    }
+}
+
+pub fn is_event_available() -> std::io::Result<bool> {
+    crossterm::event::poll(std::time::Duration::from_secs(0))
+}
+
+pub fn read_event() -> Result<Event, std::io::Error> {
+    crossterm::event::read()
+}
+
+pub fn get_event() -> Option<event::Event> {
+    if is_event_available().unwrap() {
+        Some(read_event().unwrap().into())
+    } else {
+        None
     }
 }
