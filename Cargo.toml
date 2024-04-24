@@ -1,3 +1,13 @@
+[workspace]
+members = [
+    "examples/*"
+]
+
+[workspace.dependencies]
+softbuffer = "0.4.2"
+terminalge-rs = { path = "." }
+winit = "0.29.15"
+
 [package]
 name = "terminalge-rs"
 version = "0.1.0"
