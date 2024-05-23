@@ -26,6 +26,11 @@ impl Terminal {
         let size: WindowSize = window_size().unwrap();
         let width: u16 = size.columns;
         let height: u16 = size.rows;
+        let pixel_aspect = if (size.height != 0) & (size.width != 0) {
+            size.height as f64 / size.width as f64
+        } else {
+            1.0
+        };
 
         Terminal {
             body: vec![' '; (width * height) as usize],
@@ -33,7 +38,7 @@ impl Terminal {
             width,
             height,
             aspect: width as f64 / height as f64,
-            pixel_aspect: size.height as f64 / size.width as f64,
+            pixel_aspect,
             time_point: std::time::SystemTime::now(),
         }
     }
