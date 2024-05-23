@@ -20,11 +20,10 @@ impl Player {
         let key_event: &KeyEvent;
         if let Some(event) = event {
             match event {
-                event::Event::Key(k) => key_event = k
+                event::Event::Key(k) => key_event = k,
             }
-        }
-        else {
-            return
+        } else {
+            return;
         }
         let mut delta: Vec2 = Vec2::zero();
         let key_code = &key_event.code;

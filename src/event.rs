@@ -12,7 +12,7 @@ pub enum KeyCode {
 pub enum KeyModifiers {
     CONTROL,
     SHIFT,
-    NONE
+    NONE,
 }
 
 #[derive(PartialEq)]
@@ -23,11 +23,14 @@ pub struct KeyEvent {
 
 impl KeyEvent {
     pub const fn new(code: KeyCode) -> Self {
-        Self { code, modifiers: KeyModifiers::NONE}
+        Self {
+            code,
+            modifiers: KeyModifiers::NONE,
+        }
     }
 
     pub const fn new_with_modifiers(code: KeyCode, modifiers: KeyModifiers) -> Self {
-        Self { code, modifiers}
+        Self { code, modifiers }
     }
 }
 

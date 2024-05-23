@@ -23,7 +23,12 @@ impl App {
         if let Some(event) = &self.current_event {
             if event == &event::Event::Key(KeyEvent::new(KeyCode::Char('q'))) {
                 self.running = false;
-            } else if event == &event::Event::Key(KeyEvent::new_with_modifiers(KeyCode::Char('c'), event::KeyModifiers::CONTROL)) {
+            } else if event
+                == &event::Event::Key(KeyEvent::new_with_modifiers(
+                    KeyCode::Char('c'),
+                    event::KeyModifiers::CONTROL,
+                ))
+            {
                 self.running = false;
             }
         }
