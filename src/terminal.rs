@@ -14,7 +14,7 @@ use crate::{
 pub struct Terminal {
     body: Vec<char>,
     stdout: std::io::Stdout,
-    width: u16,
+    pub width: u16,
     pub height: u16,
     aspect: f64,
     pixel_aspect: f64,
@@ -105,13 +105,51 @@ impl Terminal {
     }
 }
 
+#[cfg(feature = "common")]
 impl Display for Terminal {
     fn plot(&mut self, x: i64, y: i64, _color: &Color) {
         let rationed_x = x as f64 * self.aspect * self.pixel_aspect;
         if rationed_x >= self.width as f64 || y >= self.height as i64 || x < 0 || y < 0 {
             return;
         }
-        self.body[rationed_x as usize + y as usize * self.width as usize] = '@';
+        self.body[rationed_x as usize + y as usize * self.width as usize] = 'A';
+    }
+}
+
+#[cfg(feature = "twice")]
+impl Display for Terminal {
+    fn plot(&mut self, x: i64, y: i64, _color: &Color) {
+        if x >= self.width as i64 || y / 2 >= self.height as i64 || x < 0 || y < 0 {
+            return;
+        }
+
+        let index: usize = (x + (y / 2) * self.width as i64) as usize;
+        let current_symbol: char = self.body[index];
+        let next_symbol: char;
+
+        next_symbol = if current_symbol == ' ' {
+            if y % 2 == 0 {
+                '▀'
+            } else {
+                '▄'
+            }
+        } else if current_symbol == '▀' {
+            if y % 2 == 1 {
+                '█'
+            } else {
+                current_symbol
+            }
+        } else if current_symbol == '▄' {
+            if y % 2 == 0 {
+                '█'
+            } else {
+                current_symbol
+            }
+        } else {
+            current_symbol
+        };
+
+        self.body[index] = next_symbol;
     }
 }
 
