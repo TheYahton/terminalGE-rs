@@ -1,3 +1,4 @@
+#[derive(Clone, PartialEq)]
 pub struct Color(pub u8, pub u8, pub u8);
 
 pub trait Display {

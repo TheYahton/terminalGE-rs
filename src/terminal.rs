@@ -13,6 +13,7 @@ use crate::{
 
 pub struct Terminal {
     body: Vec<char>,
+    colors: Vec<Color>,
     stdout: std::io::Stdout,
     pub width: u16,
     pub height: u16,
@@ -36,6 +37,7 @@ impl Terminal {
 
         Terminal {
             body: vec![' '; (width * height) as usize],
+            colors: vec![Color(0, 0, 0); (width * height) as usize],
             stdout: std::io::stdout(),
             width,
             height,
@@ -57,13 +59,25 @@ impl Terminal {
 
     pub fn fill(&mut self) {
         self.body.fill(' ');
+        self.colors.fill(Color(0, 0, 0));
     }
 
     pub fn print(&mut self) {
         self.cursor_move(0, 0);
-        let _ = self
-            .stdout
-            .write_fmt(format_args!("{}", String::from_iter(self.body.clone())));
+
+        let mut prev_color: Color = Color(0, 0, 0);
+
+        for i in 0..self.body.len() {
+            if prev_color != self.colors[i] {
+                prev_color = self.colors[i].clone();
+                let Color(r, g, b) = self.colors[i];
+                let _ = self
+                    .stdout
+                    .write_fmt(format_args!("\x1b[38;2;{};{};{}m{}", r, g, b, self.body[i]));
+            } else {
+                let _ = self.stdout.write_fmt(format_args!("{}", self.body[i]));
+            }
+        }
     }
 
     pub fn cursor_move(&mut self, x: u16, y: u16) {
@@ -102,6 +116,7 @@ impl Terminal {
         let start_index: usize = ((self.height - 2) * self.width) as usize;
         for index in start_index..start_index + text.len() {
             self.body[index] = text[index - start_index] as char;
+            self.colors[index] = Color(255, 255, 255);
         }
     }
 
@@ -125,7 +140,7 @@ impl Display for Terminal {
 
 #[cfg(feature = "twice")]
 impl Display for Terminal {
-    fn plot(&mut self, x: i64, y: i64, _color: &Color) {
+    fn plot(&mut self, x: i64, y: i64, color: &Color) {
         if x >= self.width as i64 || y / 2 >= self.height as i64 || x < 0 || y < 0 {
             return;
         }
@@ -157,6 +172,7 @@ impl Display for Terminal {
         };
 
         self.body[index] = next_symbol;
+        self.colors[index] = color.clone();
     }
 }
 

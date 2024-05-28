@@ -41,13 +41,12 @@ impl App {
     fn update(&mut self) {
         self.screen.tick();
         self.check_exit();
-        self.screen.decay(60.0); // think of it as VSYNC :D
         self.screen.print();
     }
 
     fn draw(&mut self) {
         self.screen.fill();
-        drawing::circle(&mut self.screen, 15, 15, 15, &Color(255, 255, 255));
+        drawing::circle(&mut self.screen, 15, 15, 15, &Color(255, 255, 0));
         self.screen.print_fps();
     }
 
