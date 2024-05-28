@@ -19,6 +19,8 @@ pub struct Terminal {
     aspect: f64,
     pixel_aspect: f64,
     time_point: std::time::SystemTime,
+    last_fps: [f64; 120],
+    tick_counter: usize,
 }
 
 impl Terminal {
@@ -40,6 +42,8 @@ impl Terminal {
             aspect: width as f64 / height as f64,
             pixel_aspect,
             time_point: std::time::SystemTime::now(),
+            last_fps: [60.0; 120],
+            tick_counter: 0,
         }
     }
 
@@ -75,6 +79,9 @@ impl Terminal {
     }
 
     pub fn tick(&mut self) {
+        self.last_fps[self.tick_counter % self.last_fps.len()] =
+            1.0 / self.get_tick().as_secs_f64();
+        self.tick_counter += 1;
         self.time_point = std::time::SystemTime::now();
     }
 
@@ -89,7 +96,7 @@ impl Terminal {
     }
 
     pub fn print_fps(&mut self) {
-        let fps: u64 = (1.0 / self.get_tick().as_secs_f64()) as u64;
+        let fps: u64 = (self.last_fps.iter().sum::<f64>() / self.last_fps.len() as f64) as u64;
         let text: String = fps.to_string() + " FPS";
         let text: &[u8] = text.as_bytes();
         let start_index: usize = ((self.height - 2) * self.width) as usize;
