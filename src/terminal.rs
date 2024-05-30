@@ -62,7 +62,7 @@ impl Terminal {
         self.colors.fill(Color(0, 0, 0));
     }
 
-    pub fn print(&mut self) {
+    pub fn update(&mut self) {
         self.cursor_move(0, 0);
 
         let mut prev_color: Color = Color(0, 0, 0);
@@ -127,7 +127,7 @@ impl Terminal {
     }
 }
 
-#[cfg(feature = "common")]
+#[cfg(feature = "ascii")]
 impl Display for Terminal {
     fn plot(&mut self, x: i64, y: i64, _color: &Color) {
         let rationed_x = x as f64 * self.aspect * self.pixel_aspect;
@@ -138,7 +138,7 @@ impl Display for Terminal {
     }
 }
 
-#[cfg(feature = "twice")]
+#[cfg(feature = "blocks")]
 impl Display for Terminal {
     fn plot(&mut self, x: i64, y: i64, color: &Color) {
         if x >= self.width as i64 || y / 2 >= self.height as i64 || x < 0 || y < 0 {

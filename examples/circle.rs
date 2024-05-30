@@ -21,15 +21,17 @@ impl App {
 
     pub fn check_exit(&mut self) {
         if let Some(event) = &self.current_event {
-            if event == &event::Event::Key(KeyEvent::new(KeyCode::Char('q'))) {
-                self.running = false;
-            } else if event
-                == &event::Event::Key(KeyEvent::new_with_modifiers(
-                    KeyCode::Char('c'),
-                    event::KeyModifiers::CONTROL,
-                ))
-            {
-                self.running = false;
+            match event {
+                event::Event::Key(KeyEvent {
+                    code: KeyCode::Char('q'),
+                    ..
+                }) => self.running = false,
+                event::Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => self.running = false,
+                _ => (),
             }
         }
     }
@@ -41,7 +43,7 @@ impl App {
     fn update(&mut self) {
         self.screen.tick();
         self.check_exit();
-        self.screen.print();
+        self.screen.update();
     }
 
     fn draw(&mut self) {

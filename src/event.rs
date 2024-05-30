@@ -38,7 +38,3 @@ impl KeyEvent {
 pub enum Event {
     Key(KeyEvent),
 }
-
-pub trait EngineKeyCode {
-    fn to_key(&self) -> KeyCode;
-}
