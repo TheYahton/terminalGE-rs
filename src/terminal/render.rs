@@ -62,6 +62,8 @@ impl Render {
     }
 }
 
+const GRADIENT: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+const GRADIENT_SIZE: usize = GRADIENT.len();
 #[cfg(feature = "ascii")]
 impl Display for Render {
     fn plot(&mut self, x: i64, y: i64, _color: &Color) {
