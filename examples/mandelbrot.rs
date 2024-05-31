@@ -41,7 +41,7 @@ fn mandelbrot(x: f64, y: f64) -> f64 {
     let mut z = Complex::new(0.0, 0.0);
     let c = Complex::new(x, y);
     for i in 1..1000 {
-        z = c.squared() + c;
+        z = z.squared() + c;
         if z.abs() >= 2.0 {
             return i as f64 / 1000.0;
         }
