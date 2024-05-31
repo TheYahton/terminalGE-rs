@@ -62,6 +62,13 @@ impl Terminal {
         self.colors.fill(Color(0, 0, 0));
     }
 
+    #[cfg(feature = "ascii")]
+    pub fn update(&mut self) {
+        self.cursor_move(0, 0);
+        let _ = self.stdout.write_fmt(format_args!("{}", String::from_iter(self.body.clone())));
+    }
+
+    #[cfg(feature = "blocks")]
     pub fn update(&mut self) {
         self.cursor_move(0, 0);
 
@@ -130,11 +137,11 @@ impl Terminal {
 #[cfg(feature = "ascii")]
 impl Display for Terminal {
     fn plot(&mut self, x: i64, y: i64, _color: &Color) {
-        let rationed_x = x as f64 * self.aspect * self.pixel_aspect;
-        if rationed_x >= self.width as f64 || y >= self.height as i64 || x < 0 || y < 0 {
+        let rationed_y = y as f64 / (self.aspect * self.pixel_aspect);
+        if x >= self.width as i64 || rationed_y >= self.height as f64 || x < 0 || rationed_y <= 0.0 {
             return;
         }
-        self.body[rationed_x as usize + y as usize * self.width as usize] = 'A';
+        self.body[x as usize + rationed_y as usize * self.width as usize] = 'A';
     }
 }
 
