@@ -49,7 +49,7 @@ impl App {
 
     fn draw(&mut self) {
         self.screen.render.clear();
-        drawing::circle(&mut self.screen, 15, 15, 15, &Color(255, 255, 0));
+        drawing::circle(&mut self.screen.render, 15, 15, 15, &Color(255, 255, 0));
         self.screen.print_fps();
     }
 

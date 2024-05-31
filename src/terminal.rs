@@ -8,10 +8,7 @@ use crossterm::{
     ExecutableCommand,
 };
 
-use crate::{
-    drawing::{Color, Display},
-    event,
-};
+use crate::event;
 
 pub struct Terminal {
     pub render: render::Render,
@@ -83,25 +80,12 @@ impl Terminal {
         let text: String = fps.to_string() + " FPS";
         let text: &[u8] = text.as_bytes();
         self.render.put(text);
-        /*
-        let start_index: usize = ((self.height - 2) * self.width) as usize;
-        for index in start_index..start_index + text.len() {
-            self.body[index] = text[index - start_index] as char;
-            self.colors[index] = Color(255, 255, 255);
-        }
-        */
     }
 
     pub fn exit(&mut self) {
         self.cursor_move(0, 0);
         self.raw_mode();
         self.show_cursor();
-    }
-}
-
-impl Display for Terminal {
-    fn plot(&mut self, x: i64, y: i64, color: &Color) {
-        self.render.plot(x, y, &color);
     }
 }
 
