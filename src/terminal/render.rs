@@ -62,17 +62,25 @@ impl Render {
     }
 }
 
-const GRADIENT: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
-const GRADIENT_SIZE: usize = GRADIENT.len();
+const GRADIENT: [char; 70] = [
+    '$', '@', 'B', '%', '8', '&', 'W', 'M', '#', '*', 'o', 'a', 'h', 'k', 'b', 'd', 'p', 'q', 'w',
+    'm', 'Z', 'O', '0', 'Q', 'L', 'C', 'J', 'U', 'Y', 'X', 'z', 'c', 'v', 'u', 'n', 'x', 'r', 'j',
+    'f', 't', '/', '\\', '|', '(', ')', '1', '{', '}', '[', ']', '?', '-', '_', '+', '~', '<', '>',
+    'i', '!', 'l', 'I', ';', ':', ',', '\"', '^', '`', '\'', '.', ' ',
+];
+const LEN: usize = GRADIENT.len() - 1;
 #[cfg(feature = "ascii")]
 impl Display for Render {
-    fn plot(&mut self, x: i64, y: i64, _color: &Color) {
+    fn plot(&mut self, x: i64, y: i64, color: &Color) {
         let rationed_y = y as f64 / (self.aspect * self.pixel_aspect);
         if x >= self.width as i64 || rationed_y >= self.height as f64 || x < 0 || rationed_y <= 0.0
         {
             return;
         }
-        self.body[x as usize + rationed_y as usize * self.width as usize] = 'A';
+        let bright = ((color.0 as u64 + color.1 as u64 + color.2 as u64) as f64 / 765.0
+            * LEN as f64) as usize;
+
+        self.body[x as usize + rationed_y as usize * self.width as usize] = GRADIENT[LEN - bright];
     }
 }
 

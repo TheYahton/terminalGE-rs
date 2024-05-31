@@ -11,6 +11,8 @@ use crossterm::{
 use crate::event;
 
 pub struct Terminal {
+    pub width: u16,
+    pub height: u16,
     pub render: render::Render,
     stdout: std::io::Stdout,
     time_point: std::time::SystemTime,
@@ -30,6 +32,8 @@ impl Terminal {
         };
 
         Terminal {
+            width,
+            height,
             render: render::Render::new(width, height, pixel_width, pixel_height),
             stdout: std::io::stdout(),
             time_point: std::time::SystemTime::now(),
