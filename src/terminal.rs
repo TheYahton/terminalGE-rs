@@ -1,4 +1,6 @@
-use std::{io::Write, time::Duration};
+mod render;
+
+use std::time::Duration;
 
 use crossterm::{
     event::{Event, KeyCode, KeyModifiers},
@@ -12,13 +14,8 @@ use crate::{
 };
 
 pub struct Terminal {
-    body: Vec<char>,
-    colors: Vec<Color>,
+    pub render: render::Render,
     stdout: std::io::Stdout,
-    pub width: u16,
-    pub height: u16,
-    aspect: f64,
-    pixel_aspect: f64,
     time_point: std::time::SystemTime,
     last_fps: [f64; 120],
     tick_counter: usize,
@@ -29,20 +26,15 @@ impl Terminal {
         let size: WindowSize = window_size().unwrap();
         let width: u16 = size.columns;
         let height: u16 = size.rows;
-        let pixel_aspect = if (size.height != 0) & (size.width != 0) {
-            size.height as f64 / size.width as f64
+        let (pixel_width, pixel_height) = if (size.height != 0) & (size.width != 0) {
+            (size.height, size.width)
         } else {
-            1.0
+            (1, 1)
         };
 
         Terminal {
-            body: vec![' '; (width * height) as usize],
-            colors: vec![Color(0, 0, 0); (width * height) as usize],
+            render: render::Render::new(width, height, pixel_width, pixel_height),
             stdout: std::io::stdout(),
-            width,
-            height,
-            aspect: width as f64 / height as f64,
-            pixel_aspect,
             time_point: std::time::SystemTime::now(),
             last_fps: [60.0; 120],
             tick_counter: 0,
@@ -55,36 +47,6 @@ impl Terminal {
 
     pub fn hide_cursor(&mut self) {
         let _ = self.stdout.execute(crossterm::cursor::Hide);
-    }
-
-    pub fn fill(&mut self) {
-        self.body.fill(' ');
-        self.colors.fill(Color(0, 0, 0));
-    }
-
-    #[cfg(feature = "ascii")]
-    pub fn update(&mut self) {
-        self.cursor_move(0, 0);
-        let _ = self.stdout.write_fmt(format_args!("{}", String::from_iter(self.body.clone())));
-    }
-
-    #[cfg(feature = "blocks")]
-    pub fn update(&mut self) {
-        self.cursor_move(0, 0);
-
-        let mut prev_color: Color = Color(0, 0, 0);
-
-        for i in 0..self.body.len() {
-            if prev_color != self.colors[i] {
-                prev_color = self.colors[i].clone();
-                let Color(r, g, b) = self.colors[i];
-                let _ = self
-                    .stdout
-                    .write_fmt(format_args!("\x1b[38;2;{};{};{}m{}", r, g, b, self.body[i]));
-            } else {
-                let _ = self.stdout.write_fmt(format_args!("{}", self.body[i]));
-            }
-        }
     }
 
     pub fn cursor_move(&mut self, x: u16, y: u16) {
@@ -120,11 +82,14 @@ impl Terminal {
         let fps: u64 = (self.last_fps.iter().sum::<f64>() / self.last_fps.len() as f64) as u64;
         let text: String = fps.to_string() + " FPS";
         let text: &[u8] = text.as_bytes();
+        self.render.put(text);
+        /*
         let start_index: usize = ((self.height - 2) * self.width) as usize;
         for index in start_index..start_index + text.len() {
             self.body[index] = text[index - start_index] as char;
             self.colors[index] = Color(255, 255, 255);
         }
+        */
     }
 
     pub fn exit(&mut self) {
@@ -134,52 +99,9 @@ impl Terminal {
     }
 }
 
-#[cfg(feature = "ascii")]
-impl Display for Terminal {
-    fn plot(&mut self, x: i64, y: i64, _color: &Color) {
-        let rationed_y = y as f64 / (self.aspect * self.pixel_aspect);
-        if x >= self.width as i64 || rationed_y >= self.height as f64 || x < 0 || rationed_y <= 0.0 {
-            return;
-        }
-        self.body[x as usize + rationed_y as usize * self.width as usize] = 'A';
-    }
-}
-
-#[cfg(feature = "blocks")]
 impl Display for Terminal {
     fn plot(&mut self, x: i64, y: i64, color: &Color) {
-        if x >= self.width as i64 || y / 2 >= self.height as i64 || x < 0 || y < 0 {
-            return;
-        }
-
-        let index: usize = (x + (y / 2) * self.width as i64) as usize;
-        let current_symbol: char = self.body[index];
-        let next_symbol: char;
-
-        next_symbol = if current_symbol == ' ' {
-            if y % 2 == 0 {
-                '▀'
-            } else {
-                '▄'
-            }
-        } else if current_symbol == '▀' {
-            if y % 2 == 1 {
-                '█'
-            } else {
-                current_symbol
-            }
-        } else if current_symbol == '▄' {
-            if y % 2 == 0 {
-                '█'
-            } else {
-                current_symbol
-            }
-        } else {
-            current_symbol
-        };
-
-        self.body[index] = next_symbol;
-        self.colors[index] = color.clone();
+        self.render.plot(x, y, &color);
     }
 }
 
